@@ -129,6 +129,8 @@ class RockPaperScissors {
             GameError.Errors.INVALID_CHANNEL
         );
         
+        const thisThis = this;
+
         const Payload = {
             disabled: () => {
                 return new MessageActionRow()
@@ -143,7 +145,61 @@ class RockPaperScissors {
                 this.Buttons.Rock,
                 this.Buttons.Paper,
                 this.Buttons.Scissor
-            )
+            ),
+            /**
+             * @param {"WON"|"LOST"|"TIE"} status 
+             * @param {"ROCK"|"PAPER"|"SCISSORS"} pick
+             */
+            defaultDisabled: (status, pick) => {
+                pick = pick.toUpperCase();
+
+                function getPick(){
+                    if(pick == "PAPER"){
+                        return thisThis.Buttons.Paper
+                    } else if(pick == "ROCK"){
+                        return thisThis.Buttons.Rock
+                    } else if(pick == "SCISSORS"){
+                        return thisThis.Buttons.Scissor
+                    }
+                }
+
+                function actionRow(button){
+                    return {
+                        type: 1,
+                        components: perfectActionRow(button)
+                    }
+                }
+
+                function perfectActionRow(button){
+                    if(button.customId == customIds.Paper){
+                        return [
+                            new MessageButton(thisThis.Buttons.Rock).setDisabled(true),
+                            new MessageButton(button).setDisabled(true),
+                            new MessageButton(thisThis.Buttons.Scissor).setDisabled(true)
+                        ]
+                    } else if(button.customId == customIds.Rock){
+                        return [
+                            new MessageButton(button).setDisabled(true),
+                            new MessageButton(thisThis.Buttons.Paper).setDisabled(true),
+                            new MessageButton(thisThis.Buttons.Scissor).setDisabled(true)
+                        ]
+                    } else if(button.customId == customIds.Scissors){
+                        return [
+                            new MessageButton(thisThis.Buttons.Rock).setDisabled(true),
+                            new MessageButton(thisThis.Buttons.Paper).setDisabled(true),
+                            new MessageButton(button).setDisabled(true)
+                        ]
+                    }
+                }
+
+                if(status == "LOST"){
+                    return actionRow(new MessageButton(getPick()).setStyle("DANGER").setDisabled(true));
+                } else if(status == "TIE"){
+                    return actionRow(new MessageButton(getPick()).setStyle("SECONDARY").setDisabled(true));
+                } else if(status == "WON"){
+                    return actionRow(new MessageButton(getPick()).setStyle("SUCCESS").setDisabled(true));
+                }
+            }
         }
         const StartPayload = Payloads.Start
         .setComponents([
@@ -173,7 +229,9 @@ class RockPaperScissors {
             "SCISSORS": "SCISSORS"
         };
 
-        const AI = choicesAr[Math.round(Math.random() * choicesAr.length)-1];
+        const AICount = (Math.round((Math.random() * choicesAr.length)-1));
+        const AI = choicesAr[AICount];
+        if(AI == undefined) console.log(`💻 For debug reasons:`, AI, choicesAr, AICount);
 
         const optionChecker = (text) => {
             const customId = i.customId.replace(BaseCustomId + "_", "")
@@ -190,31 +248,47 @@ class RockPaperScissors {
             .replaceAll(`{{playerMention}}`, i.user.toString());
         }
 
+        const OriginalCustomId = i.customId.replace(BaseCustomId + "_", "")
+        .replace(`_${this.UUID[0]}`, "")
+        .replace(`_${this.UUID[1]}`, "")
+        .replace(`_${this.UUID[2]}`, "");
+
+        /**
+         * @type {"WON"|"LOST"|"TIE"|"UNKNOWN"}
+         */
+        let PlayerStatus = "UNKNOWN";
+        if (
+            (AI === choices.SCISSORS && i.customId === customIds.Paper) ||
+            (AI === choices.ROCK && i.customId === customIds.Scissors) ||
+            (AI === choices.PAPER && i.customId === customIds.Rock)
+        ) {
+            PlayerStatus = "LOST";
+        } else if(AI == OriginalCustomId){
+            PlayerStatus = "TIE";
+        } else {
+            PlayerStatus = "WON";
+        }
+
         const WinPayload = Payloads.Win
         .setComponents([
-            Payload.disabled()
+            Payload.defaultDisabled(PlayerStatus, OriginalCustomId)
         ])
         .replaceOptions(optionChecker)
         .toJSON();
 
         const LostPayload = Payloads.Lost
         .setComponents([
-            Payload.disabled()
+            Payload.defaultDisabled(PlayerStatus, OriginalCustomId)
         ])
         .replaceOptions(optionChecker)
         .toJSON();
 
         const TiePayload = Payloads.Tie
         .setComponents([
-            Payload.disabled()
+            Payload.defaultDisabled(PlayerStatus, OriginalCustomId)
         ])
         .replaceOptions(optionChecker)
         .toJSON();
-
-        const OriginalCustomId = i.customId.replace(BaseCustomId + "_", "")
-        .replace(`_${this.UUID[0]}`, "")
-        .replace(`_${this.UUID[1]}`, "")
-        .replace(`_${this.UUID[2]}`, "");
 
         if (
             (AI === choices.SCISSORS && i.customId === customIds.Paper) ||
