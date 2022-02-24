@@ -63,7 +63,7 @@ class RockPaperScissors {
             Paper: new MessageButton()
             .setLabel(GameOptions.ScissorButton?.label || `Paper`)
             .setEmoji(GameOptions.ScissorButton?.Emoji || `📄`)
-            .setStyle(GameOptions.RockButton?.style || PrimaryStyle)
+            .setStyle(GameOptions.ScissorButton?.style || PrimaryStyle)
             .setCustomId(customIds.Paper),
             Scissor: new MessageButton()
             .setLabel(GameOptions.ScissorButton?.label || `Scissors`)
@@ -213,7 +213,7 @@ class RockPaperScissors {
          */
         const Reply = await Interaction.reply(StartPayload);
 
-        const i = await Reply.awaitMessageComponent({
+        const i = await Reply.channel.awaitMessageComponent({
             filter: i => i.user.id == Interaction.user.id,
             componentType: "BUTTON"
         });
@@ -229,9 +229,10 @@ class RockPaperScissors {
             "SCISSORS": "SCISSORS"
         };
 
-        const AICount = (Math.round((Math.random() * choicesAr.length)-1));
+        let AICount = (Math.round((Math.random() * choicesAr.length)-1));
+        if(AICount == -1) AICount = 0;
         const AI = choicesAr[AICount];
-        if(AI == undefined) console.log(`💻 For debug reasons:`, AI, choicesAr, AICount);
+        //if(AI == undefined) console.log(`💻 For debug reasons:`, AI, choicesAr, AICount);
 
         const optionChecker = (text) => {
             const customId = i.customId.replace(BaseCustomId + "_", "")
