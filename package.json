@@ -1,0 +1,33 @@
+{
+  "name": "gamecord.js",
+  "version": "1.0.0",
+  "description": "🎮 Intergrate games right into your Discord bot!",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cordbots/gamecord.git"
+  },
+  "keywords": [
+    "discord",
+    "discord-games",
+    "discord-game",
+    "games",
+    "discord-bot",
+    "discordjs",
+    "discord.js",
+    "gamecord"
+  ],
+  "author": "Turtlepaw",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cordbots/gamecord/issues"
+  },
+  "homepage": "https://github.com/cordbots/gamecord#readme",
+  "dependencies": {
+    "discord.js": "^13.6.0",
+    "uuid": "^8.3.2"
+  }
+}
