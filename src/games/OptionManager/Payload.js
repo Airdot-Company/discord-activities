@@ -17,23 +17,25 @@ class GamecordPayload {
      */
     constructor(
         Options = {
-            embeds: []
+            embeds: null
         }
-    ){
+    ) {
         /**
          * The gamecord embeds.
          * @type {GamecordEmbed[]}
          */
         this.embeds = [];
 
-        for(const embed of Options.embeds){
-            if(embed.type != "GAMECORD_EMBED") throw new GameError(
-                `Embeds must be an array of Gamecord Embeds`,
-                GameError.Errors.INVALID_EMBED
-            )
+        if (Options?.embeds != null) {
+            for (const embed of Options?.embeds) {
+                if (embed.type != "GAMECORD_EMBED") throw new GameError(
+                    `Embeds must be an array of Gamecord Embeds`,
+                    GameError.Errors.INVALID_EMBED
+                )
 
-            this.embeds.push(embed.build().Embed());
-        };
+                this.embeds.push(embed.build().Embed());
+            };
+        }
 
         /**
          * The reply content.
@@ -67,7 +69,7 @@ class GamecordPayload {
         this.components = null;
     }
 
-    setFetchReply(boolean=true){
+    setFetchReply(boolean = true) {
         this.fetchReply = boolean
         return this;
     }
@@ -76,36 +78,38 @@ class GamecordPayload {
      * @private
      * @returns {Discord.MessageMentionOptions}
      */
-    parseMentions(){
-        if(this.Mentions == "NONE"){
+    parseMentions() {
+        if (this.Mentions == "NONE") {
             return {
                 users: [],
                 roles: []
             }
+        } else if(this.Mentions == "ALL"){
+            return null;
         } else {
             return this.Mentions;
         }
     }
 
-    setComponents(components){
+    setComponents(components) {
         this.components = components
         return this;
     }
 
-    replaceOptions(optionChecker = (e=> e)){
+    replaceOptions(optionChecker = (e => e)) {
         this.embeds.forEach(embed => {
             embed.setTitle(optionChecker(embed.title))
             embed.setDescription(optionChecker(embed.description))
         });
-        if(this.content != null) this.content = optionChecker(this.content);
-        
+        if (this.content != null) this.content = optionChecker(this.content);
+
         return this;
     }
 
     /**
      * @returns {Discord.InteractionReplyOptions}
      */
-    toJSON(){
+    toJSON() {
         return {
             embeds: this.embeds,
             content: this.content,

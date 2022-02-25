@@ -1,7 +1,7 @@
 const { CommandInteraction, Message } = require("discord.js");
 const Discord = require("discord.js");
 
-class Reply {
+class ReplyManager {
     /**
      * 
      * @param {CommandInteraction|Message} InteractionMessage 
@@ -15,6 +15,17 @@ class Reply {
         this.replied = null;
     }
 
+    /**
+     * Gets the user.
+     * @type {Discord.User}
+     */
+    get User(){
+        if(this.isInteraction()){
+            return this.intOrMessage.user;
+        } else if(this.isMessage()){
+            return this.intOrMessage.author;
+        }
+    }
     isMessage() {
         return !this.isInteraction();
     }
@@ -35,23 +46,30 @@ class Reply {
         } else if (this.isInteraction()) {
             return this.replied = (await intOrMessage.reply(Object.assign({
                 fetchReply: true
-            }, this.intOrMessage.reply)));
+            }, options)));
         }
     }
 
     /**
     * Edits the message or interaction.
     * @param {Discord.InteractionReplyOptions} options 
+    * @param {Discord.ButtonInteraction} ButtonInteraction
     * @returns {Promise<Message>}
     */
-    async edit (options) {
+    async edit(options, ButtonInteraction = null) {
         const { intOrMessage } = this;
-        if (this.isMessage()) {
-            await this.replied.edit(options);
-        } else if (this.isInteraction()) {
-            await intOrMessage.editReply(Object.assign({
+        if(ButtonInteraction != null){
+            this.replied = await ButtonInteraction.update(Object.assign({
                 fetchReply: true
-            }, this.intOrMessage.reply));
+            }, options));
+        } else {
+            if (this.isMessage()) {
+                await this.replied.edit(options);
+            } else if (this.isInteraction()) {
+                await intOrMessage.editReply(Object.assign({
+                    fetchReply: true
+                }, options));
+            }
         }
 
         return this.replied;
@@ -65,3 +83,5 @@ class Reply {
         return this.replied
     }
 }
+
+module.exports = ReplyManager;

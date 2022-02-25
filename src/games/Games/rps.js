@@ -7,6 +7,7 @@ const GameError = require("../../utils/Error");
 const fixText = require("../../utils/fixText");
 const GamecordEmbed = require("../OptionManager/Embed");
 const GamecordPayload = require("../OptionManager/Payload");
+const ReplyManager = require("../OptionManager/ReplyManager");
 
 class RockPaperScissors {
     /**
@@ -111,15 +112,17 @@ class RockPaperScissors {
      * @param {Boolean} SlashCommand
      */
     async start(Channel, Interaction, SlashCommand){
+        const Int = new ReplyManager(Interaction);
+
         const {
             Payloads,
             customIds
         } = this;
 
-        if(!SlashCommand || Interaction?.author != null) throw new GameError(
-            `We currently do not support message commands!`,
-            GameError.Errors.MESSAGE_COMMAND
-        );
+        // if(!SlashCommand || Interaction?.author != null) throw new GameError(
+        //     `We currently do not support message commands!`,
+        //     GameError.Errors.MESSAGE_COMMAND
+        // );
         if(!Interaction || !Interaction.isCommand()) throw new GameError(
             `Interaction must be a command interaction.`,
             GameError.Errors.INVALID_INTERACTION
@@ -211,12 +214,14 @@ class RockPaperScissors {
         /**
          * @type {Message}
          */
-        const Reply = await Interaction.reply(StartPayload);
+        const Reply = await Int.reply(StartPayload);
 
         const i = await Reply.channel.awaitMessageComponent({
             filter: i => i.user.id == Interaction.user.id,
             componentType: "BUTTON"
         });
+
+        if(![customIds.Rock, customIds.Paper, customIds.Scissors].includes(i.customId)) return;
 
         const choicesAr = [
             "ROCK",

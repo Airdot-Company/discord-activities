@@ -1,12 +1,14 @@
 //a.k.a Rock Paper Scissors
 
-const { Channel, CommandInteraction, Message, MessageActionRow, MessageButton, GuildMember } = require("discord.js");
+const { Channel, CommandInteraction, Message, MessageActionRow, MessageButton, GuildMember, User } = require("discord.js");
 const { v4 } = require("uuid");
+const { timestamp: Timestamp } = require("discord.js-util");
 const { BaseCustomId } = require("../../utils/constants");
 const GameError = require("../../utils/Error");
 const fixText = require("../../utils/fixText");
 const GamecordEmbed = require("../OptionManager/Embed");
 const GamecordPayload = require("../OptionManager/Payload");
+const ReplyManager = require("../OptionManager/ReplyManager");
 
 class RockPaperScissors {
     /**
@@ -23,6 +25,7 @@ class RockPaperScissors {
      * @property {RpsButton} [ScissorButton]
      * @property {RpsButton} [JoinButton]
      * @property {RpsButton} [DenyButton]
+     * @property {Number} [TimeToJoin]
      */
 
     /**
@@ -33,19 +36,30 @@ class RockPaperScissors {
      * @property {GamecordPayload} [TieMessage]
      * @property {GamecordPayload} [awaitUserJoin]
      * @property {GamecordPayload} [awaitUserInput]
+     * @property {GamecordPayload} [YouMessage]
+     * @property {GamecordPayload} [BotMessage]
      */
 
     /**
      * Creates an RPS game!
      * @param {RpsOptions} GameOptions 
      * @param {RpsEmbedOptions} GameEmbeds
-     * @param {GuildMember} User
+     * @param {User} User
+     * @param {Boolean} Devlopment **Only** use this if you are a developer!
      */
     constructor(
         User,
         GameOptions = { },
-        GameEmbeds = { }
+        GameEmbeds = { },
+        Devlopment
     ){
+        this.dev = Devlopment;
+
+        if(!User || User?.username == null) throw new GameError(
+            `Invalid User`,
+            GameError.Errors.INVALID_USER
+        );
+    
         const PrimaryStyle = "PRIMARY";
 
         this.User = User;
@@ -57,6 +71,8 @@ class RockPaperScissors {
             v4(),
             v4()
         ];
+
+        this.TimeToJoin = GameOptions.TimeToJoin || 300000;
 
         const customIds = this.customIds = {
             Rock: `${BaseCustomId}_ROCK_${uuids[0]}`,
@@ -127,9 +143,18 @@ class RockPaperScissors {
                 embeds: [
                     new GamecordEmbed()
                     .setTitle(`📥 Joining a game!`)
-                    .setDescription(`{{playerMention}} wants you to join a game {{player2Mention}}`)
+                    .setDescription(`{{playerMention}} wants you to join a game {{player2Mention}}!\n\n⏰ Join Timer ends: {{time}}`)
                 ],
-                content: `{{player2Mention}}`
+                content: `{{player2Mention}}`,
+                mentions: "ALL"
+            }),
+            BotMessage: GameEmbeds.BotMessage || new GamecordPayload({
+                content: `❌ You can't play with bots!`,
+                ephemeral: true
+            }),
+            YouMessage: GameEmbeds.YouMessage || new GamecordPayload({
+                content: `❌ You can't play with yourself!`,
+                ephemeral: true
             })
         }
     }
@@ -141,16 +166,13 @@ class RockPaperScissors {
      * @param {Boolean} SlashCommand
      */
     async start(Channel, Interaction, SlashCommand){
+        const Int = new ReplyManager(Interaction);
         const {
             Payloads,
             customIds
         } = this;
 
-        if(!SlashCommand || Interaction?.author != null) throw new GameError(
-            `We currently do not support message commands!`,
-            GameError.Errors.MESSAGE_COMMAND
-        );
-        if(!Interaction || !Interaction.isCommand()) throw new GameError(
+        if((!Interaction || !Interaction.isCommand()) && Int.isInteraction()) throw new GameError(
             `Interaction must be a command interaction.`,
             GameError.Errors.INVALID_INTERACTION
         );
@@ -158,10 +180,36 @@ class RockPaperScissors {
             `Channel must be a text channel.`,
             GameError.Errors.INVALID_CHANNEL
         );
+
+        if(this.User.bot){
+            const BotPayload = Payloads.BotMessage
+            .toJSON();
+
+            await Int.reply(BotPayload)
+            return;
+        }
+
+        if((this.User.id == Int.User.id) && !this.dev){
+            const YouPayload = Payloads.YouMessage
+            .toJSON();
+            
+            await Int.reply(YouPayload)
+            return;
+        }
         
         const thisThis = this;
 
         const Payload = {
+            MultiplayerButtons: new MessageActionRow()
+            .addComponents(
+                this.Buttons.Req,
+                this.Buttons.Deny
+            ),
+            MultiplayerButtonsDisabled: new MessageActionRow()
+            .addComponents(
+                new MessageButton(this.Buttons.Req).setDisabled(true),
+                new MessageButton(this.Buttons.Deny).setDisabled(true).setStyle(`DANGER`)
+            ),
             disabled: () => {
                 return new MessageActionRow()
                 .addComponents(
@@ -231,107 +279,171 @@ class RockPaperScissors {
                 }
             }
         }
-        const StartPayload = Payloads.Start
+
+        const JoinPayload = Payloads.userInput
         .setComponents([
-            Payload.default
+            Payload.MultiplayerButtons
         ])
-        .setFetchReply()
-        .toJSON();
+        .replaceOptions(e => {
+            return e.replaceAll(`{{time}}`,
+                new Timestamp()
+                .setTime(Date.now() + this.TimeToJoin)
+                .setStyle("R")
+                .toString()
+            )
+            .replaceAll(`{{playerName}}`, Int.User.username)
+            .replaceAll(`{{player}}`, Int.User.username)
+            .replaceAll(`{{playerId}}`, Int.User.id)
+            .replaceAll(`{{playerTag}}`, Int.User.tag)
+            .replaceAll(`{{playerMention}}`, Int.User.toString())
+            .replaceAll(`{{player2Name}}`, this.User.username)
+            .replaceAll(`{{player2}}`, this.User.username)
+            .replaceAll(`{{player2Id}}`, this.User.id)
+            .replaceAll(`{{player2Tag}}`, this.User.tag)
+            .replaceAll(`{{player2Mention}}`, this.User.toString());
+        })
+        .setFetchReply();
 
         /**
          * @type {Message}
          */
-        const Reply = await Interaction.reply(StartPayload);
+        const Reply = await Int.reply(JoinPayload.toJSON());
 
-        const i = await Reply.channel.awaitMessageComponent({
-            filter: i => i.user.id == Interaction.user.id,
+        setTimeout(async () => {
+            const load = JoinPayload.setComponents([
+                Payload.MultiplayerButtonsDisabled
+            ])
+            .toJSON();
+
+            await Int.edit(load);
+            return;
+        }, this.TimeToJoin);
+
+        const joinBt = await Interaction.channel.awaitMessageComponent({
+            filter: i => i.user.id == this.User.id,
+            componentType: "BUTTON",
+            time: this.TimeToJoin
+        });
+
+        if(joinBt.customId == customIds.Deny) {
+            const load = JoinPayload.setComponents([
+                Payload.MultiplayerButtonsDisabled
+            ])
+            .toJSON();
+
+            await Int.edit(load, joinBt);
+            return;
+        }
+
+        const StartPayload = Payloads.Start
+        .setComponents([
+            Payload.default
+        ])
+        .toJSON();
+
+
+        await Int.edit(StartPayload);
+
+        const collector = await Reply.channel.createMessageComponentCollector({
+            filter: i => i.user.id == Int.User.id,
             componentType: "BUTTON"
         });
 
-        const choicesAr = [
-            "ROCK",
-            "PAPER",
-            "SCISSORS"
-        ];
-        const choices = {
-            "ROCK": "ROCK",
-            "PAPER": "PAPER",
-            "SCISSORS": "SCISSORS"
-        };
+        let player1Picked = false;
+        let player1Pick = null;
 
-        let AICount = (Math.round((Math.random() * choicesAr.length)-1));
-        if(AICount == -1) AICount = 0;
-        const AI = choicesAr[AICount];
-        //if(AI == undefined) console.log(`💻 For debug reasons:`, AI, choicesAr, AICount);
+        collector.on("collect", async i => {
+            if(![customIds.Rock, customIds.Paper, customIds.Scissors].includes(i.customId)) return;
 
-        const optionChecker = (text) => {
-            const customId = i.customId.replace(BaseCustomId + "_", "")
-            .replace(`_${this.UUID[0]}`, "")
-            .replace(`_${this.UUID[1]}`, "")
-            .replace(`_${this.UUID[2]}`, "");
-
-            return text.replaceAll(`{{playerPick}}`, fixText(customId))
-            .replaceAll(`{{aiPick}}`, fixText(AI))
-            .replaceAll(`{{playerName}}`, i.user.username)
-            .replaceAll(`{{player}}`, i.user.username)
-            .replaceAll(`{{playerId}}`, i.user.id)
-            .replaceAll(`{{playerTag}}`, i.user.tag)
-            .replaceAll(`{{playerMention}}`, i.user.toString());
-        }
-
-        const OriginalCustomId = i.customId.replace(BaseCustomId + "_", "")
-        .replace(`_${this.UUID[0]}`, "")
-        .replace(`_${this.UUID[1]}`, "")
-        .replace(`_${this.UUID[2]}`, "");
-
-        /**
-         * @type {"WON"|"LOST"|"TIE"|"UNKNOWN"}
-         */
-        let PlayerStatus = "UNKNOWN";
-        if (
-            (AI === choices.SCISSORS && i.customId === customIds.Paper) ||
-            (AI === choices.ROCK && i.customId === customIds.Scissors) ||
-            (AI === choices.PAPER && i.customId === customIds.Rock)
-        ) {
-            PlayerStatus = "LOST";
-        } else if(AI == OriginalCustomId){
-            PlayerStatus = "TIE";
-        } else {
-            PlayerStatus = "WON";
-        }
-
-        const WinPayload = Payloads.Win
-        .setComponents([
-            Payload.defaultDisabled(PlayerStatus, OriginalCustomId)
-        ])
-        .replaceOptions(optionChecker)
-        .toJSON();
-
-        const LostPayload = Payloads.Lost
-        .setComponents([
-            Payload.defaultDisabled(PlayerStatus, OriginalCustomId)
-        ])
-        .replaceOptions(optionChecker)
-        .toJSON();
-
-        const TiePayload = Payloads.Tie
-        .setComponents([
-            Payload.defaultDisabled(PlayerStatus, OriginalCustomId)
-        ])
-        .replaceOptions(optionChecker)
-        .toJSON();
-
-        if (
-            (AI === choices.SCISSORS && i.customId === customIds.Paper) ||
-            (AI === choices.ROCK && i.customId === customIds.Scissors) ||
-            (AI === choices.PAPER && i.customId === customIds.Rock)
-        ) {
-            await i.update(LostPayload);
-        } else if(AI == OriginalCustomId){
-            await i.update(TiePayload);
-        } else {
-            await i.update(WinPayload);
-        }
+            if(!player1Picked){
+                player1Pick = i.customId;
+            } else {
+                const choicesAr = [
+                    "ROCK",
+                    "PAPER",
+                    "SCISSORS"
+                ];
+                const choices = {
+                    "ROCK": "ROCK",
+                    "PAPER": "PAPER",
+                    "SCISSORS": "SCISSORS"
+                };
+        
+                let AICount = (Math.round((Math.random() * choicesAr.length)-1));
+                if(AICount == -1) AICount = 0;
+                const AI = choicesAr[AICount];
+                //if(AI == undefined) console.log(`💻 For debug reasons:`, AI, choicesAr, AICount);
+        
+                const optionChecker = (text) => {
+                    const customId = i.customId.replace(BaseCustomId + "_", "")
+                    .replace(`_${this.UUID[0]}`, "")
+                    .replace(`_${this.UUID[1]}`, "")
+                    .replace(`_${this.UUID[2]}`, "");
+        
+                    return text.replaceAll(`{{playerPick}}`, fixText(customId))
+                    .replaceAll(`{{aiPick}}`, fixText(AI))
+                    .replaceAll(`{{playerName}}`, i.user.username)
+                    .replaceAll(`{{player}}`, i.user.username)
+                    .replaceAll(`{{playerId}}`, i.user.id)
+                    .replaceAll(`{{playerTag}}`, i.user.tag)
+                    .replaceAll(`{{playerMention}}`, i.user.toString());
+                }
+        
+                const OriginalCustomId = i.customId.replace(BaseCustomId + "_", "")
+                .replace(`_${this.UUID[0]}`, "")
+                .replace(`_${this.UUID[1]}`, "")
+                .replace(`_${this.UUID[2]}`, "");
+        
+                /**
+                 * @type {"WON"|"LOST"|"TIE"|"UNKNOWN"}
+                 */
+                let PlayerStatus = "UNKNOWN";
+                if (
+                    (AI === choices.SCISSORS && i.customId === customIds.Paper) ||
+                    (AI === choices.ROCK && i.customId === customIds.Scissors) ||
+                    (AI === choices.PAPER && i.customId === customIds.Rock)
+                ) {
+                    PlayerStatus = "LOST";
+                } else if(AI == OriginalCustomId){
+                    PlayerStatus = "TIE";
+                } else {
+                    PlayerStatus = "WON";
+                }
+        
+                const WinPayload = Payloads.Win
+                .setComponents([
+                    Payload.defaultDisabled(PlayerStatus, OriginalCustomId)
+                ])
+                .replaceOptions(optionChecker)
+                .toJSON();
+        
+                const LostPayload = Payloads.Lost
+                .setComponents([
+                    Payload.defaultDisabled(PlayerStatus, OriginalCustomId)
+                ])
+                .replaceOptions(optionChecker)
+                .toJSON();
+        
+                const TiePayload = Payloads.Tie
+                .setComponents([
+                    Payload.defaultDisabled(PlayerStatus, OriginalCustomId)
+                ])
+                .replaceOptions(optionChecker)
+                .toJSON();
+        
+                if (
+                    (AI === choices.SCISSORS && i.customId === customIds.Paper) ||
+                    (AI === choices.ROCK && i.customId === customIds.Scissors) ||
+                    (AI === choices.PAPER && i.customId === customIds.Rock)
+                ) {
+                    await i.update(LostPayload);
+                } else if(AI == OriginalCustomId){
+                    await i.update(TiePayload);
+                } else {
+                    await i.update(WinPayload);
+                }
+            }
+        });
     }
 }
 
