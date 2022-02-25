@@ -60,10 +60,13 @@ npm i gamecord.js
         })
         //You can also have `LostMessage`, `TieMessage`, and `StartGameMessage`
         //...
-    }).start(interaction.channel, interaction, true)
+    }).start(interaction.channel, interaction, true);
 ```
 
 ## 📸 Images
 ### 🪨 Rock Paper Scissors
 ![Image](https://turtlepaw.is-from.space/r/Discord_x4pPd4Tlfc.png)
 ![GIF](https://turtlepaw.is-from.space/r/Discord_q3V5E5hx20.gif)
+
+## ❓ Support
+[![Discord Server](http://invidget.switchblade.xyz/834199640702320650)](https://discord.gg/BMBUcJvV4Q)
