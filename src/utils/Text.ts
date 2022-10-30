@@ -1,7 +1,4 @@
-/**
- * @param {String} text
- */
-module.exports = (text) => {
+export function CapitalizeText(text: string) {
     //Check to make sure everything is right
     if (!text) throw new TypeError("`text` is a required arg and is missing");
     if (typeof text != "string") throw new TypeError("`text` must be a `string`");
@@ -15,9 +12,6 @@ module.exports = (text) => {
 
     //Merge them and make the first letter upper case
     let returnedText = oldText.toUpperCase() + newText.toLowerCase();
-
-    //Remove `_` and `-`
-    returnedText = returnedText.replaceAll(`_`, ` `).replaceAll(`-`, ` `)
 
     //Return the final text
     return `${returnedText}`;

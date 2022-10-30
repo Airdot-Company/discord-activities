@@ -1,4 +1,4 @@
-module.exports = class GameError extends Error {
+export class GameError extends Error {
     /**
      * @param {String} message 
      * @param {String} header 
@@ -16,16 +16,15 @@ module.exports = class GameError extends Error {
         );
   
       super(message);
-      this.name = `Gamecord.js Error [${header}]`;
+      this.name = `Error [${header}]`;
     }
   }
   
-module.exports.Errors = {
-    "INVALID_ARG": "INVALID_ARGUMENT",
-    "INVALID_CONSTRUCTOR_ARGUMENT": "INVALID_CONSTRUCTOR_ARGUMENT",
-    "INVALID_EMBED": "INVALID_EMBED",
-    "MESSAGE_COMMAND": "MESSAGE_COMMAND",
-    "INVALID_INTERACTION": "INVALID_INTERACTION",
-    "INVALID_CHANNEL": "INVALID_CHANNEL",
-    "INVALID_USER": "INVALID_USER"
+export enum ErrorMessages {
+    InvalidArgument = "INVALID_ARGUMENT",
+    InvalidContructorArgument = "INVALID_CONSTRUCTOR_ARGUMENT",
+    InvalidMessageOptions = "INVALID_EMBED",
+    InvalidInteraction = "INVALID_INTERACTION",
+    InvalidChannel = "INVALID_CHANNEL",
+    InvalidMember = "INVALID_MEMBER"
 }
