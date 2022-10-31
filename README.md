@@ -1,5 +1,6 @@
 # @airdot/activities
 
+**🎉 Join the party on Discord:** https://discord.gg/Rgxv5M6sq9
 ## 📃 Documentation
 You can view the documentation/guide on [airdot-company.github.io](https://airdot-company.github.io/discord-activities/).
 ## 📦 Installation
