@@ -1,4 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, Message } from "discord.js";
+import { ExtractRockPaperScissorsId } from "../../utils/Text";
 import { LimitedButtonBuilder } from "../../lib/Button";
 import { Game } from "../../lib/Game";
 import { MultiplayerRockPaperScissorsIds, MultiplayerRockPaperScissorsOptions } from "../../typings";
@@ -52,7 +53,7 @@ export class MultiplayerRockPaperScissors extends Game {
         } = this;
         const EmbedColor = Options?.EmbedColor || "#5865f2";
         const InteractionMember = await Interaction.guild.members.fetch(Interaction.user.id);
-        const MemberUser = await Interaction.user.fetch();
+        const MemberUser = await Member.user.fetch();
         Options = {
             ...Options,
             JoinTime: DefaultJoinTime,
@@ -169,6 +170,15 @@ export class MultiplayerRockPaperScissors extends Game {
                 time: this.Options?.JoinTime || DefaultJoinTime
             });
 
+            Message.edit({
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>()
+                        .addComponents(
+                            InviteButtons.components.map(e => e.setDisabled(true))
+                        )
+                ]
+            })
+
             if (ButtonInteraction.customId == Ids.Deny) {
                 return ButtonInteraction.reply({
                     embeds: [
@@ -198,7 +208,7 @@ export class MultiplayerRockPaperScissors extends Game {
             time: 1000000
         });
 
-        let Selected = {
+        let Selected: { Inviter: string; Member: string; } = {
             Inviter: null,
             Member: null
         };
@@ -227,6 +237,15 @@ export class MultiplayerRockPaperScissors extends Game {
 
             let PlayAgainMessage: Message;
             if (collector.collected.size > 1) {
+                const Embed = new EmbedBuilder()
+                    .setColor(Options?.EmbedColor)
+                    .addFields([{
+                        name: `${MemberUser.username} Selected:`,
+                        value: ExtractRockPaperScissorsId(Selected.Member, true)
+                    }, {
+                        name: `${Interaction.user.username} Selected:`,
+                        value: ExtractRockPaperScissorsId(Selected.Inviter, true)
+                    }]);
                 //Calculate entries
                 if (
                     (Selected.Inviter === Ids.Scissors && Selected.Member === Ids.Paper) ||
@@ -235,30 +254,27 @@ export class MultiplayerRockPaperScissors extends Game {
                 ) {
                     PlayAgainMessage = await Interaction.channel.send({
                         embeds: [
-                            new EmbedBuilder()
+                            Embed
                                 .setTitle(`🏆 ${Interaction.user.username} wins!`)
                                 .setDescription(`${Interaction.user.username} has won the game, would you like to play again?`)
-                                .setColor(Options.EmbedColor)
                         ],
                         components: [PlayAgainButtons],
                     });
                 } else if (Selected.Inviter == Selected.Member) {
                     PlayAgainMessage = await Interaction.channel.send({
                         embeds: [
-                            new EmbedBuilder()
+                            Embed
                                 .setTitle("Tie")
                                 .setDescription(`You're tied, would you like to play again?`)
-                                .setColor(Options.EmbedColor)
                         ],
                         components: [PlayAgainButtons]
                     });
                 } else {
                     PlayAgainMessage = await Interaction.channel.send({
                         embeds: [
-                            new EmbedBuilder()
+                            Embed
                                 .setTitle(`🏆 ${MemberUser.username} wins!`)
                                 .setDescription(`${MemberUser.username} has won the game, would you like to play again?`)
-                                .setColor(Options.EmbedColor)
                         ],
                         components: [PlayAgainButtons]
                     });

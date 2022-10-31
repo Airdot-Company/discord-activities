@@ -13,3 +13,5 @@ npm install @airdot/activities
 ## ✨ Features
 - 🍃 Easy to intergrate.
 - 📦 Built in TypeScript.
+
+## 📸 Screenshots

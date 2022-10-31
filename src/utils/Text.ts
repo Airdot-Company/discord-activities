@@ -16,3 +16,16 @@ export function CapitalizeText(text: string) {
     //Return the final text
     return `${returnedText}`;
 }
+
+export function ExtractRockPaperScissorsId(str: string, showEmoji: boolean = true) {
+    const Id = str.replaceAll(/[0-9]/g, '').replace("_", "").replace("Activities_", "");
+    if (showEmoji) {
+        if (Id == "Rock") {
+            return "🪨 Rock";
+        } else if (Id == "Paper") {
+            return "📄 Paper";
+        } else if (Id == "Scissors") {
+            return "✂️ Scissors";
+        } else return "❓ Unknown"
+    } else return Id;
+}
