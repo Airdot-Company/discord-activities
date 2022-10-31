@@ -1,16 +1,17 @@
 {
-  "name": "activities",
-  "version": "1.0.0",
+  "name": "@airdot/activities",
+  "version": "2.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf ./dist && tsc",
     "test": "node ./tests/index.js",
-    "dev": "yarn build && yarn test"
+    "dev": "yarn build && yarn test",
+    "install": "yarn build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cordbots/gamecord.git"
+    "url": "git+https://github.com/Airdot-Company/discord-activities.git"
   },
   "keywords": [
     "discord",
