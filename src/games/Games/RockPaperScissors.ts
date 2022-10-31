@@ -1,4 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, Message } from "discord.js";
+import { ExtractRockPaperScissorsId } from "../../utils/Text";
 import { LimitedButtonBuilder } from "../../lib/Button";
 import { Game } from "../../lib/Game";
 import { MultiplayerRockPaperScissorsIds, MultiplayerRockPaperScissorsOptions, RockPaperScissorsIds, RockPaperScissorsOptions } from "../../typings";
@@ -103,6 +104,15 @@ export class RockPaperScissors extends Game {
             const Selected = i.customId;
             const Items = [Ids.Rock, Ids.Paper, Ids.Scissors];
             const Random = Items[Math.floor(Math.random() * Items.length)];
+            const Embed = new EmbedBuilder()
+                .setColor(Options.EmbedColor)
+                .addFields([{
+                    name: `You Selected:`,
+                    value: ExtractRockPaperScissorsId(Selected, true)
+                }, {
+                    name: `Random User Selected:`,
+                    value: ExtractRockPaperScissorsId(Random, true)
+                }]);
             //Calculate entries
             if (
                 (Selected === Ids.Scissors && Random === Ids.Paper) ||
@@ -111,10 +121,9 @@ export class RockPaperScissors extends Game {
             ) {
                 PlayAgainMessage = await i.reply({
                     embeds: [
-                        new EmbedBuilder()
+                        Embed
                             .setTitle(`🏆 ${Interaction.user.username} wins!`)
                             .setDescription(`${Interaction.user.username} has won the game, would you like to play again?`)
-                            .setColor(Options.EmbedColor)
                     ],
                     components: [PlayAgainButtons],
                     fetchReply: true
@@ -122,10 +131,9 @@ export class RockPaperScissors extends Game {
             } else if (Selected == Random) {
                 PlayAgainMessage = await i.reply({
                     embeds: [
-                        new EmbedBuilder()
+                        Embed
                             .setTitle("Tie")
                             .setDescription(`You're tied, would you like to play again?`)
-                            .setColor(Options.EmbedColor)
                     ],
                     components: [PlayAgainButtons],
                     fetchReply: true
@@ -133,10 +141,9 @@ export class RockPaperScissors extends Game {
             } else {
                 PlayAgainMessage = await i.reply({
                     embeds: [
-                        new EmbedBuilder()
+                        Embed
                             .setTitle(`🏆 Random User wins!`)
                             .setDescription(`Random User has won the game, would you like to play again?`)
-                            .setColor(Options.EmbedColor)
                     ],
                     components: [PlayAgainButtons],
                     fetchReply: true
