@@ -54,3 +54,13 @@ export interface RockPaperScissorsOptions {
     Buttons?: RockPaperScissorsButtons;
     EmbedColor?: HexColorString;
 }
+
+export interface WouldYouRatherIds {
+    Option1: string;
+    Option2: string;
+    PlayAgain: string;
+}
+
+export interface WouldYouRatherOptions {
+    EmbedColor?: HexColorString;
+}

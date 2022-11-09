@@ -1,5 +1,6 @@
 import { MultiplayerRockPaperScissors } from "./games/Multiplayer/MultiplayerRockPaperScissors";
 import { RockPaperScissors } from "./games/Games/RockPaperScissors";
+import { WouldYouRather } from "./games/Games/WouldYouRather";
 import {
     HexColorString,
     MultiplayerRockPaperScissorsButtons,
@@ -7,7 +8,9 @@ import {
     MultiplayerRockPaperScissorsOptions,
     RockPaperScissorsButtons,
     RockPaperScissorsIds,
-    RockPaperScissorsOptions
+    RockPaperScissorsOptions,
+    WouldYouRatherIds,
+    WouldYouRatherOptions
 } from "./typings";
 
 export {
@@ -19,5 +22,8 @@ export {
     MultiplayerRockPaperScissorsOptions,
     RockPaperScissorsButtons,
     RockPaperScissorsIds,
-    RockPaperScissorsOptions
+    RockPaperScissorsOptions,
+    WouldYouRatherIds,
+    WouldYouRatherOptions,
+    WouldYouRather
 }

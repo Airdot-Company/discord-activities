@@ -31,7 +31,7 @@ export class MultiplayerRockPaperScissors extends Game {
             Scissors: CreateId("Scissors"),
             Join: CreateId("Accept_Invite"),
             Deny: CreateId("Deny_Invite"),
-            PlayAgain: CreateId("Play_Again")
+            PlayAgain: CreateId("Multiplayer_Play_Again_RPS", false)
         }
     }
 

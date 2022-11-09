@@ -22,3 +22,9 @@ npm install @airdot/activities
 ![Rock Paper Scissors Invite](/media/RPS_Invite.png)
 #### Multiplayer Rock Paper Scissors
 ![Multiplayer Rock Paper Scissors](/media/MultiplayerRPS.png)
+
+#### upcoming
+- [ ] Fix file naming
+- [ ] Add forever lasting play again buttons
+- [ ] More Games!!!
+- [ ] Change slash commands to `/activity rps`

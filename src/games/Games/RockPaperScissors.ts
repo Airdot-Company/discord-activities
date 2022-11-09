@@ -22,7 +22,7 @@ export class RockPaperScissors extends Game {
             Rock: CreateId("Rock"),
             Paper: CreateId("Paper"),
             Scissors: CreateId("Scissors"),
-            PlayAgain: CreateId("Play_Again")
+            PlayAgain: CreateId("Play_Again_RPS", false)
         }
     }
 

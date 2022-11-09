@@ -48,6 +48,10 @@ export function generateId() {
     return `${randomNumber()}${randomNumber()}${randomNumber()}${randomNumber()}${randomNumber()}`;
 }
 
-export function CreateId(Name: string) {
-    return `Activities_${generateId()}_${Name}`;
+export function CreateId(Name: string, unique: boolean = true) {
+    if (unique) {
+        return `Activities_${generateId()}_${Name}`;
+    } else {
+        return `Activities_${Name}`;
+    }
 }
