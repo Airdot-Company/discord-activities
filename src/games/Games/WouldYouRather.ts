@@ -39,7 +39,8 @@ export class WouldYouRather extends Game {
             EmbedColor: "#5865f2"
         }
 
-        const fetched = await (await fetch("https://api.tovade.xyz/v1/fun/wyr")).json();
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+        const fetched = await (await fetch("http://api.tovade.xyz/v1/fun/wyr")).json();
         const Option1 = {
             Label: fetched.questions[0],
             Percentage: fetched.percentage[1]
@@ -66,7 +67,7 @@ export class WouldYouRather extends Game {
             .addComponents(
                 new ButtonBuilder()
                     .setLabel(Option1.Label)
-                    .setStyle(ButtonStyle.Primary)
+                    .setStyle(ButtonStyle.Secondary)
                     .setCustomId(Ids.Option1),
                 new ButtonBuilder()
                     .setLabel(Option2.Label)
@@ -77,12 +78,12 @@ export class WouldYouRather extends Game {
             .addComponents(
                 new ButtonBuilder()
                     .setLabel(`${Option1.Label} (${Option1.Percentage}%)`)
-                    .setStyle(ButtonStyle.Primary)
+                    .setStyle(Option1.Percentage > Option2.Percentage ? ButtonStyle.Success : ButtonStyle.Danger)
                     .setCustomId(Ids.Option1)
                     .setDisabled(true),
                 new ButtonBuilder()
                     .setLabel(`${Option2.Label} (${Option2.Percentage}%)`)
-                    .setStyle(ButtonStyle.Secondary)
+                    .setStyle(Option2.Percentage > Option1.Percentage ? ButtonStyle.Success : ButtonStyle.Danger)
                     .setCustomId(Ids.Option2)
                     .setDisabled(true)
             )

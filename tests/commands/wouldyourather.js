@@ -17,19 +17,11 @@ module.exports = {
     execute: function (interaction, client) {
         const Member = interaction.options.getMember("member");
         if (Member != null) {
-            new MultiplayerRockPaperScissors()
-                .setMember(Member)
-                .StartGame(interaction);
+            //new MultiplayerRockPaperScissors()
+            //    .setMember(Member)
+            //    .StartGame(interaction);
         } else {
             new WouldYouRather()
-                .StartGame(interaction);
-        }
-        if (Member != null) {
-            new MultiplayerRockPaperScissors()
-                .setMember(Member)
-                .StartGame(interaction);
-        } else {
-            new RockPaperScissors()
                 .StartGame(interaction);
         }
     }

@@ -10,7 +10,7 @@ const client = new Discord.Client({
 client.commands = new Discord.Collection();
 
 const { REST, Routes, OAuth2Scopes, Events } = require('discord.js');
-const { client_id, guild_id, token } = require('./config.json');
+const { client_id, guild_id, token } = require('../config.json');
 const fs = require('node:fs');
 
 const commands = [];
