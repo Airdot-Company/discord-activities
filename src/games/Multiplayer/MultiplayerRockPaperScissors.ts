@@ -6,6 +6,7 @@ import { MultiplayerRockPaperScissorsIds, MultiplayerRockPaperScissorsOptions } 
 import { CreateId } from "../../utils/CustomId";
 import { ErrorMessages, GameError } from "../../utils/Error";
 import { Verifiers } from "../../utils/Verifiers";
+import { DefaultColor } from "../../constants";
 
 const DefaultJoinTime = 300000;
 
@@ -57,7 +58,7 @@ export class MultiplayerRockPaperScissors extends Game {
         Options = {
             ...Options,
             JoinTime: DefaultJoinTime,
-            EmbedColor: "#5865f2"
+            EmbedColor: DefaultColor
         }
 
         if (!Verifiers.isHexColor(Options?.EmbedColor)) throw new GameError(

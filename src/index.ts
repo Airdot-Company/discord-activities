@@ -12,8 +12,12 @@ import {
     WouldYouRatherIds,
     WouldYouRatherOptions
 } from "./typings";
+import {
+    FindTheWord
+} from "./games/Games/FindTheWord";
 
 export {
+    FindTheWord,
     MultiplayerRockPaperScissors,
     RockPaperScissors,
     HexColorString,

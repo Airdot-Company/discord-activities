@@ -1,5 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, CommandInteraction, ComponentType, EmbedBuilder, GuildMember, Message } from "discord.js";
 import fetch from "node-fetch";
+import { DefaultColor } from "../../constants";
 import { LimitedButtonBuilder } from "../../lib/Button";
 import { Game } from "../../lib/Game";
 import { WouldYouRatherIds, WouldYouRatherOptions } from "../../typings";
@@ -36,7 +37,7 @@ export class WouldYouRather extends Game {
         const InteractionMember = await Interaction.guild.members.fetch(Interaction.user.id);
         Options = {
             ...Options,
-            EmbedColor: "#5865f2"
+            EmbedColor: DefaultColor
         }
 
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'

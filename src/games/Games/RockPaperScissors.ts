@@ -6,6 +6,7 @@ import { MultiplayerRockPaperScissorsIds, MultiplayerRockPaperScissorsOptions, R
 import { CreateId } from "../../utils/CustomId";
 import { ErrorMessages, GameError } from "../../utils/Error";
 import { Verifiers } from "../../utils/Verifiers";
+import { DefaultColor } from "../../constants";
 
 const DefaultJoinTime = 300000;
 
@@ -39,7 +40,7 @@ export class RockPaperScissors extends Game {
         const InteractionMember = await Interaction.guild.members.fetch(Interaction.user.id);
         Options = {
             ...Options,
-            EmbedColor: "#5865f2"
+            EmbedColor: DefaultColor
         }
 
         if (!Verifiers.isHexColor(Options?.EmbedColor)) throw new GameError(

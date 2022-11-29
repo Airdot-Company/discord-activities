@@ -1,6 +1,8 @@
 # Changelog
 > **Note:**
 > Want to improve something? Check out the [format](#format)
+## 11/28/2022
+- Add find the word!
 #### 11/27/2022
 - Add would you rather
 #### 10/30/2022

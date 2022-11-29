@@ -3,25 +3,35 @@ import { LimitedButtonBuilder } from "./lib/Button";
 
 export type HexColorString = `#${string}`;
 
-export interface MultiplayerRockPaperScissorsIds {
+export interface GameIds {
+    PlayAgain: string;
+}
+
+export interface GameOptions {
+    EmbedColor?: HexColorString;
+}
+
+export interface GameButtons {
+    PlayAgain?: LimitedButtonBuilder;
+}
+
+export interface MultiplayerRockPaperScissorsIds extends GameIds {
     Rock: string;
     Paper: string;
     Scissors: string;
     Join: string;
     Deny: string;
-    PlayAgain: string;
 }
 
-export interface MultiplayerRockPaperScissorsButtons {
+export interface MultiplayerRockPaperScissorsButtons extends GameButtons {
     Paper?: LimitedButtonBuilder;
     Rock?: LimitedButtonBuilder;
     Scissors?: LimitedButtonBuilder;
     Join?: LimitedButtonBuilder;
     Deny?: LimitedButtonBuilder;
-    PlayAgain?: LimitedButtonBuilder;
 }
 
-export interface MultiplayerRockPaperScissorsOptions {
+export interface MultiplayerRockPaperScissorsOptions extends GameOptions {
     Buttons?: MultiplayerRockPaperScissorsButtons;
     /**
      * The time for the other user to join.
@@ -29,38 +39,39 @@ export interface MultiplayerRockPaperScissorsOptions {
      * *Optionally, you can use [ms](https://npm.im/ms) to turn a string into ms*
      */
     JoinTime?: number;
-    EmbedColor?: HexColorString;
     /**
      * This is not recommended to use as it may get people annoyed.
      */
     SkipInvite?: boolean;
 }
 
-export interface RockPaperScissorsIds {
+export interface RockPaperScissorsIds extends GameIds {
     Rock: string;
     Paper: string;
     Scissors: string;
-    PlayAgain: string;
 }
 
-export interface RockPaperScissorsButtons {
+export interface RockPaperScissorsButtons extends GameButtons {
     Paper?: LimitedButtonBuilder;
     Rock?: LimitedButtonBuilder;
     Scissors?: LimitedButtonBuilder;
-    PlayAgain?: LimitedButtonBuilder;
 }
 
-export interface RockPaperScissorsOptions {
+export interface RockPaperScissorsOptions extends GameOptions {
     Buttons?: RockPaperScissorsButtons;
-    EmbedColor?: HexColorString;
 }
 
-export interface WouldYouRatherIds {
+export interface WouldYouRatherIds extends GameIds {
     Option1: string;
     Option2: string;
-    PlayAgain: string;
 }
 
-export interface WouldYouRatherOptions {
-    EmbedColor?: HexColorString;
+export interface WouldYouRatherOptions extends GameOptions { }
+
+export interface FindTheWordIds extends GameIds {
+    Guess: string;
+}
+
+export interface FindTheWordOptions extends GameOptions {
+    Time?: number;
 }
