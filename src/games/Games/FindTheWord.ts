@@ -85,7 +85,7 @@ export class FindTheWord extends Game {
             embeds: [
                 new EmbedBuilder()
                     .setTitle("Activity Started - Find the word!")
-                    .setDescription(`Ends in ${TimeLeft}\n\n${inlineCode(word)}`)
+                    .setDescription(`Ends ${TimeLeft}\n\n${inlineCode(word)}`)
                     .setColor(Options.EmbedColor)
                 /*.addFields([{
                     name: `words (dev!)`,
@@ -184,7 +184,7 @@ export class FindTheWord extends Game {
                     embeds: [
                         new EmbedBuilder()
                             .setTitle("Activity Started - Find the word!")
-                            .setDescription(`${isMore ? `Ends in ${TimeLeft}\n\n` : ""}${inlineCode(word)}`)
+                            .setDescription(`${isMore ? `Ends ${TimeLeft}\n\n` : ""}${inlineCode(word)}`)
                             .addFields([{
                                 name: "Found Words",
                                 value: found.map(e => inlineCode(e)).join(" ")
@@ -200,7 +200,7 @@ export class FindTheWord extends Game {
             } else {
                 await Modal.reply({
                     ephemeral: true,
-                    content: `❌ Your guess is wrong, Try again.`
+                    content: `❌ Your guess is wrong, try again.`
                 });
             }
 
