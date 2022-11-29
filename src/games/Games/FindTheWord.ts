@@ -8,7 +8,7 @@ import { FindTheWordIds, FindTheWordOptions } from "../../typings";
 import { CreateId } from "../../utils/CustomId";
 import { ErrorMessages, GameError } from "../../utils/Error";
 import { Verifiers } from "../../utils/Verifiers";
-import { DisableButtons } from "../../utils/Buttons";
+import { DisableButtons, ResolvedComponent } from "../../utils/Buttons";
 
 const DefaultTime = 10000;
 
@@ -120,7 +120,7 @@ export class FindTheWord extends Game {
                         .setColor(Options.EmbedColor)
                 ],
                 components: [
-                    new ActionRowBuilder<SelectMenuBuilder | ButtonBuilder>()
+                    new ActionRowBuilder<ResolvedComponent>()
                         .addComponents(
                             DisableButtons(Reply.components[0].components)
                         ), PlayAgainButtons]
@@ -192,7 +192,7 @@ export class FindTheWord extends Game {
                             .setColor(Options.EmbedColor)
                     ],
                     components: words.length == found.length ? [
-                        new ActionRowBuilder<SelectMenuBuilder | ButtonBuilder>()
+                        new ActionRowBuilder<ResolvedComponent>()
                             .addComponents(
                                 DisableButtons(i.message.components[0].components)
                             ), PlayAgainButtons] : [ActionButtons]

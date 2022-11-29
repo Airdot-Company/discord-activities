@@ -1,19 +1,32 @@
-import { ActionRowComponent, ButtonBuilder, ButtonComponent, ComponentBuilder, ComponentType, MessageActionRowComponent, MessageComponent, SelectMenuBuilder, SelectMenuComponent } from "discord.js";
+import { ActionRowComponent, ButtonBuilder, ButtonComponent, ChannelSelectMenuBuilder, ComponentBuilder, ComponentType, MentionableSelectMenuBuilder, MessageActionRowComponent, MessageComponent, RoleSelectMenuBuilder, SelectMenuBuilder, SelectMenuComponent, StringSelectMenuBuilder, UserSelectMenuBuilder } from "discord.js";
 import { LimitedButtonBuilder } from "../lib/Button";
 
-export function isSelect(component: MessageComponent): component is SelectMenuComponent {
+export type ResolvedComponent = RoleSelectMenuBuilder |
+    ChannelSelectMenuBuilder |
+    UserSelectMenuBuilder |
+    MentionableSelectMenuBuilder |
+    SelectMenuBuilder |
+    ButtonBuilder;
+
+export function ResolveComponent(component: MessageComponent): ResolvedComponent {
     const ResolvedComponent = component.toJSON();
-    return ResolvedComponent.type == ComponentType.RoleSelect ||
-        ResolvedComponent.type == ComponentType.ChannelSelect ||
-        ResolvedComponent.type == ComponentType.UserSelect ||
-        ResolvedComponent.type == ComponentType.MentionableSelect ||
-        ResolvedComponent.type == ComponentType.StringSelect;
+    if (ResolvedComponent.type == ComponentType.RoleSelect) {
+        return RoleSelectMenuBuilder.from(ResolvedComponent);
+    } else if (ResolvedComponent.type == ComponentType.ChannelSelect) {
+        return ChannelSelectMenuBuilder.from(ResolvedComponent);
+    } else if (ResolvedComponent.type == ComponentType.UserSelect) {
+        return UserSelectMenuBuilder.from(ResolvedComponent);
+    } else if (ResolvedComponent.type == ComponentType.MentionableSelect) {
+        return MentionableSelectMenuBuilder.from(ResolvedComponent);
+    } else if (ResolvedComponent.type == ComponentType.StringSelect) {
+        return StringSelectMenuBuilder.from(ResolvedComponent);
+    } else if (ResolvedComponent.type == ComponentType.Button) {
+        return ButtonBuilder.from(ResolvedComponent);
+    }
 }
 
 export function DisableButtons(components: MessageActionRowComponent[]) {
     return components.map(e => {
-        const isSelectMenu = isSelect(e);
-        if (isSelectMenu) return SelectMenuBuilder.from(e).setDisabled(true)
-        else return ButtonBuilder.from(e).setDisabled(true);
+        return ResolveComponent(e).setDisabled(true);
     });
 }
