@@ -15,8 +15,19 @@ import {
 import {
     FindTheWord
 } from "./games/Games/FindTheWord";
+import {
+    ResolveComponent,
+    DisableButtons,
+    ResolvedComponent
+} from "./utils/Buttons";
+
+export const Utils = {
+    ResolveComponent,
+    DisableButtons
+}
 
 export {
+    ResolvedComponent,
     FindTheWord,
     MultiplayerRockPaperScissors,
     RockPaperScissors,
