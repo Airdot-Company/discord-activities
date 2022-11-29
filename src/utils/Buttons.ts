@@ -1,4 +1,4 @@
-import { ActionRowComponent, ButtonBuilder, ButtonComponent, ChannelSelectMenuBuilder, ComponentBuilder, ComponentType, MentionableSelectMenuBuilder, MessageActionRowComponent, MessageComponent, RoleSelectMenuBuilder, SelectMenuBuilder, SelectMenuComponent, StringSelectMenuBuilder, UserSelectMenuBuilder } from "discord.js";
+import { ActionRowComponent, AnyComponentBuilder, ButtonBuilder, ButtonComponent, ChannelSelectMenuBuilder, ComponentBuilder, ComponentType, MentionableSelectMenuBuilder, MessageActionRowComponent, MessageComponent, RoleSelectMenuBuilder, SelectMenuBuilder, SelectMenuComponent, StringSelectMenuBuilder, UserSelectMenuBuilder } from "discord.js";
 import { LimitedButtonBuilder } from "../lib/Button";
 
 export type ResolvedComponent = RoleSelectMenuBuilder |
@@ -8,7 +8,7 @@ export type ResolvedComponent = RoleSelectMenuBuilder |
     SelectMenuBuilder |
     ButtonBuilder;
 
-export function ResolveComponent(component: MessageComponent): ResolvedComponent {
+export function ResolveComponent(component: MessageComponent | AnyComponentBuilder): ResolvedComponent {
     const ResolvedComponent = component.toJSON();
     if (ResolvedComponent.type == ComponentType.RoleSelect) {
         return RoleSelectMenuBuilder.from(ResolvedComponent);
