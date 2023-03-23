@@ -103,4 +103,8 @@ dist
 # TernJS port file
 .tern-port
 
+# yarn v3 cache
+.yarn
+
+# testing
 config.json
